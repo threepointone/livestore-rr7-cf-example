@@ -1,39 +1,24 @@
-import { reactRouter } from '@react-router/dev/vite'
-import { cloudflare } from '@cloudflare/vite-plugin'
-import tailwindcss from '@tailwindcss/vite'
-import { defineConfig } from 'vite'
-import { spawn } from 'node:child_process'
-import { livestoreDevtoolsPlugin } from '@livestore/devtools-vite'
+import { reactRouter } from "@react-router/dev/vite";
+import { cloudflare } from "@cloudflare/vite-plugin";
+import tailwindcss from "@tailwindcss/vite";
+import { defineConfig } from "vite";
+// import { livestoreDevtoolsPlugin } from "@livestore/devtools-vite";
+// import devToolsJson from "vite-plugin-dev-tools-json";
 
 export default defineConfig({
-  server: {
-    port: process.env.PORT ? Number(process.env.PORT) : 60_001,
+  // server: {
+  //   port: process.env.PORT ? Number(process.env.PORT) : 60_001,
+  // },
+  optimizeDeps: {
+    exclude: ["@livestore/wa-sqlite"],
   },
-  worker: { format: 'es' },
+  worker: { format: "es" },
   plugins: [
-    livestoreDevtoolsPlugin({ schemaPath: './app/livestore/schema.ts' }),
-    cloudflare({ viteEnvironment: { name: 'ssr' } }),
+    // devToolsJson(),
+    cloudflare({ viteEnvironment: { name: "ssr" } }),
     tailwindcss(),
+    // this is causing the "invoke was called before connect" error
+    // livestoreDevtoolsPlugin({ schemaPath: "./app/livestore/schema.ts" }),
     reactRouter(),
-    // Running `wrangler dev` as part of `vite dev` needed for `@livestore/sync-cf`
-    {
-      name: 'wrangler-dev',
-      configureServer: async (server) => {
-        const wrangler = spawn(
-          './node_modules/.bin/wrangler',
-          ['dev', '--port', '8787'],
-          {
-            stdio: ['ignore', 'inherit', 'inherit'],
-            shell: true,
-          }
-        )
-
-        server.httpServer?.on('close', () => wrangler.kill())
-
-        wrangler.on('exit', (code) =>
-          console.error(`wrangler dev exited with code ${code}`)
-        )
-      },
-    },
   ],
-})
+});

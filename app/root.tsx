@@ -5,32 +5,31 @@ import {
   Outlet,
   Scripts,
   ScrollRestoration,
-} from "react-router"
-import { makePersistedAdapter } from '@livestore/adapter-web'
-import LiveStoreSharedWorker from '@livestore/adapter-web/shared-worker?sharedworker'
-import { LiveStoreProvider } from '@livestore/react'
-import type React from 'react'
-import { unstable_batchedUpdates as batchUpdates } from 'react-dom'
+} from "react-router";
+import { makePersistedAdapter } from "@livestore/adapter-web";
+import LiveStoreSharedWorker from "@livestore/adapter-web/shared-worker?sharedworker";
+import { LiveStoreProvider } from "@livestore/react";
+import type React from "react";
+import { unstable_batchedUpdates as batchUpdates } from "react-dom";
 
-import LiveStoreWorker from './livestore/livestore.worker?worker'
-import { schema } from './livestore/schema'
+import LiveStoreWorker from "./livestore/livestore.worker?worker";
+import { schema } from "./livestore/schema";
 
-import type { Route } from "./+types/root"
-import "./app.css"
+import type { Route } from "./+types/root";
+import "./app.css";
 
 export const getStoreId = () => {
-  if (typeof window === 'undefined') return 'unused'
+  if (typeof window === "undefined") return "unused";
 
-  const searchParams = new URLSearchParams(window.location.search)
-  const storeId = searchParams.get('storeId')
-  if (storeId !== null) return storeId
+  const searchParams = new URLSearchParams(window.location.search);
+  const storeId = searchParams.get("storeId");
+  if (storeId !== null) return storeId;
 
-  const newAppId = crypto.randomUUID()
-  searchParams.set('storeId', newAppId)
+  const newAppId = crypto.randomUUID();
+  searchParams.set("storeId", newAppId);
 
-  window.location.search = searchParams.toString()
-}
-
+  window.location.search = searchParams.toString();
+};
 
 export const links: Route.LinksFunction = () => [
   { rel: "preconnect", href: "https://fonts.googleapis.com" },
@@ -43,15 +42,17 @@ export const links: Route.LinksFunction = () => [
     rel: "stylesheet",
     href: "https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap",
   },
-]
+];
 
-const storeId = getStoreId()
+// const storeId = getStoreId();
+// let's just use a sample store id for now
+const storeId = "sample-store";
 
 const adapter = makePersistedAdapter({
-  storage: { type: 'opfs' },
+  storage: { type: "opfs" },
   worker: LiveStoreWorker,
   sharedWorker: LiveStoreSharedWorker,
-})
+});
 
 export function Layout({ children }: { children: React.ReactNode }) {
   return (
@@ -69,35 +70,35 @@ export function Layout({ children }: { children: React.ReactNode }) {
           renderLoading={(_) => <div>Loading LiveStore ({_.stage})...</div>}
           batchUpdates={batchUpdates}
           storeId={storeId}
-          syncPayload={{ authToken: 'insecure-token-change-me' }}
+          syncPayload={{ authToken: "insecure-token-change-me" }}
         >
           {children}
           <ScrollRestoration />
-          <Scripts />
         </LiveStoreProvider>
+        <Scripts />
       </body>
-    </html >
-  )
+    </html>
+  );
 }
 
 export default function App() {
-  return <Outlet />
+  return <Outlet />;
 }
 
 export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
-  let message = "Oops!"
-  let details = "An unexpected error occurred."
-  let stack: string | undefined
+  let message = "Oops!";
+  let details = "An unexpected error occurred.";
+  let stack: string | undefined;
 
   if (isRouteErrorResponse(error)) {
-    message = error.status === 404 ? "404" : "Error"
+    message = error.status === 404 ? "404" : "Error";
     details =
       error.status === 404
         ? "The requested page could not be found."
-        : error.statusText || details
+        : error.statusText || details;
   } else if (import.meta.env.DEV && error && error instanceof Error) {
-    details = error.message
-    stack = error.stack
+    details = error.message;
+    stack = error.stack;
   }
 
   return (
@@ -110,5 +111,5 @@ export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
         </pre>
       )}
     </main>
-  )
+  );
 }
