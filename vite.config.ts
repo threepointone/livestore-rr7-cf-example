@@ -3,7 +3,7 @@ import { cloudflare } from "@cloudflare/vite-plugin";
 import tailwindcss from "@tailwindcss/vite";
 import { defineConfig } from "vite";
 // import { livestoreDevtoolsPlugin } from "@livestore/devtools-vite";
-// import devToolsJson from "vite-plugin-dev-tools-json";
+import devToolsJson from "vite-plugin-devtools-json";
 
 export default defineConfig({
   // server: {
@@ -14,7 +14,7 @@ export default defineConfig({
   },
   worker: { format: "es" },
   plugins: [
-    // devToolsJson(),
+    devToolsJson(),
     cloudflare({ viteEnvironment: { name: "ssr" } }),
     tailwindcss(),
     // this is causing the "invoke was called before connect" error

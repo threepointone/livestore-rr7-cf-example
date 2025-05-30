@@ -47,13 +47,12 @@ export default {
       // || url.pathname.startsWith("/_livestore")
     ) {
       return livestoreWorker.fetch(request, env, ctx);
-    } else if (
-      url.pathname === "/.well-known/appspecific/com.chrome.devtools.json"
-    ) {
-      return new Response(JSON.stringify({}), {
-        headers: { "Content-Type": "application/json" },
-      });
     }
+
+    return new Response(JSON.stringify({}), {
+      headers: { "Content-Type": "application/json" },
+    });
+
     return requestHandler(request, {
       cloudflare: { env, ctx },
     });
